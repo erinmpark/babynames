@@ -21,9 +21,9 @@ Then install the dependencies:
 
 ## The Data 
 
-The Social Security Administration organizes the baby name data, somewhat inconveniently, as year-by-year text files named `yob[year].txt`, beginning in 1880 for national data and 1910 for state data. The data for the previous calendar year is usually released around Mother's Day.
+The Social Security Administration organizes the baby name data, somewhat inconveniently, year-by-year in text files named `yob[year].txt`, beginning in 1880 for national data and 1910 for state data. The data for the previous calendar year is usually released around Mother's Day.
 
-As of the 2018 data, there are 109,174 names, constituting any name-gender combination that appeared in at least one year a minimum of five times. The scripts in this repo download this raw data and provide tools for aggregating specific (or all) names in specific (or all) spans of years will the ability to exclude uncommon names.
+As of the 2018 data, there are 109,174 names, constituting any name-gender combination that appeared in at least one year a minimum of five times. The scripts in this repo download this raw data and provide tools for aggregating specific (or all) names in specific (or all) spans of years with the ability to exclude uncommon names.
 
 ### Getting the Data
 
@@ -47,17 +47,17 @@ You can also get the state-by-state data, which extracts to the [`data/states`](
 	const babynames = require("babynames");
 	babynames.download({ states: true }, function() { ... });
 
-### Total babies born each year
+### Total Babies Born Each Year
 
 There is also a file called `data/totals.json` with data on the total number of babies born (or at least, those issued a SSN) each year, [per the SSA](http://www.ssa.gov/oact/babynames/numberUSbirths.html), which is used for calculating frequencies as percentages. This is necessary because the totals are higher than the sum of each name in the name files, which don't include names that occur fewer than five times.
 
 If you want to re-download this data--maybe it's a new year or you suspect there has been a revision--just run `./scripts/total_births.js`, which will scrape the page on the SSA website and overwrite the file in the repo.
 
-### Let's get started!
+### Let's Get Started!
 
 Now that you've downloaded the raw data, the fun begins!
 
-## Extracting names
+## Extracting Names
 
 Once you've downloaded the data, you can aggregate it on a per-name basis and store it in a variety of formats:
 
@@ -65,16 +65,16 @@ Once you've downloaded the data, you can aggregate it on a per-name basis and st
 
 ### Options
 
-These options are either passed as `--format`, e.g. from the command-line, or as key values in Node (see [test/test.js](test/test.js))
+These options are either passed as `--format`, e.g. from the command line, or as key values in Node (see [test/test.js](test/test.js))
 
 | option | default | purpose |
 | -------- | --------- | ---------- |
 | `names` | `null`: Every name! | A comma-separated list of names to extract. If you don't append a name with `-f` or `-m`, it will search for both genders.|
 | `start` | `1880` | The first year of data to extract. The default, `1880`, is the first available year of data. |
 | `end` | Most recent year |  The last year of data to extract. The default is the previous calendar year starting in June, otherwise the year before that. |
-| `min` | `1` | Don't include names that don't show up at least this many times in at least one year. The default is functionally `5` in the data. |
-| `cutoff` | `1` | Don't include names that don't show up in at least this many individual years. |
-| `format` | Must be provided | Format out output. Options are `json`, `csv`, `jsonp`, `csvs`, `mongodb`. See following explanation. |
+| `min` | `1` | Exclude names that don't show up at least this many times in at least one year. The default is functionally `5` in the data. |
+| `cutoff` | `1` | Exclude names that don't show up in at least this many individual years. |
+| `format` | Must be provided | Format output. Options are `json`, `csv`, `jsonp`, `csvs`, `mongodb`. See following explanation. |
 
 #### Formats
 + `json`: Each name is stored as an individual JSON file in the `/flat_files/individual/` directory.
@@ -83,7 +83,7 @@ These options are either passed as `--format`, e.g. from the command-line, or as
 + `csvs`: Each name is stored as an individual CSV file in the `/flat_files/individual/` directory.
 + `mongodb`: All names are inserted into a MongoDB instance, using the slug `[name]-[m|f]` as the `_id`. *Note:* Because this is optional, the [mongodb](https://www.npmjs.org/package/mongodb) Node module is not included as a dependency, so you'll need to install it yourself as well as running a mongo server: `npm install mongodb`. You can pass a `--mongo_uri` argument, which defaults to `mongodb://localhost:27017`, as well as a `db_name` argument, which defaults to `babynames`.
 
-### How it Works
+### How It Works
 
 First, the script reads every raw file from the SSA and stores the data on a per-name basis in memory. For each name, it records both the absolute number of babies with that name in a given year and the percentage of all babies of the same gender with that name. The denominator in that calculation is the gender-specific total number of babies [as reported on SSA.gov](http://www.ssa.gov/oact/babynames/numberUSbirths.html), NOT the calculated sum of all baby name frequencies (which will be lower than the actual number of children born in the United States, given that the data only counts names that appear at least five times). For JSON, the years are stored as keys in an object for fast retrieval. Here is the output of `./index.js store --name=Clifford-m --format=json --start=1960 --end=1980`, which would be writting to `flat_files/individuals/clifford-m.json`:
 
@@ -147,7 +147,7 @@ The `store` script comes with several options for basic analysis:
 
 + `normalize`: Add a third property to each name that is the normalized value for the percentage figures, such that the peak percentage year is 1.
 + `peak`: Find the peak value and year for both raw values and percents
-+ `maxima`: Identify all the local maxima -- points where every value 5 years before and after is lower. Only counts maxima that are at least 25 percent of peak value.
++ `maxima`: Identify all the local maxima--points where every value 5 years before and after is lower. Only counts maxima that are at least 25 percent of peak value.
 + `dense`: If a name does not appear in a year in the range specified between `start` and `end`, list that year in the data as `0`. Otherwise it is not included at all (a "sparse" format).
 
 ## Extras
